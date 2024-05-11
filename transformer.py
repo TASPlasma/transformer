@@ -1,8 +1,8 @@
 from config import Config
-from transformer.feed_forward import MLP
-from transformer.positional_encoding import PositionalEncoding
-from transformer.encoder import Encoder
-from transformer.decoder import Decoder
+from feed_forward import MLP
+from positional_encoding import PositionalEncoding
+from encoder import Encoder
+from decoder import Decoder
 
 # recall (m, n) means m rows, n columns
 # Dense/Linear/Affine etc. maps input_dim to output_dim 
@@ -36,7 +36,7 @@ class Transformer(nn.Module):
         """
         # setup
         cfg = self.config
-        embed = MLP(cfg)
+        embed = MLP(cfg) # block is default false
         pos_enc = PositionalEncoding(cfg)
         encoder = Encoder(cfg)
         decoder = Decoder(cfg)

@@ -6,13 +6,15 @@ class MLP(nn.Module):
     2 is small an input dimension for multihead attention
     """
     config: Config
+    block: bool = False
 
     @nn.compact
     def __call__(self, x):
         cfg = self.config
         # Process each layer defined in layer_sizes
-        for i, size in enumerate(cfg.sizes):
+        array_sizes = cfg.ff_sizes if self.block else cfg.sizes
+        for i, size in enumerate(array_sizes):
             x = nn.Dense(features=size)(x)  # Apply Dense layer
-            if i < len(cfg.sizes) - 1:  # Apply ReLU activation to all but the last layer
+            if i < len(array_sizes) - 1:  # Apply ReLU activation to all but the last layer
                 x = nn.relu(x)
         return x
