@@ -1,4 +1,5 @@
 from config import Config
+from single_head import SingleHead
 
 class MultiHeadAttention(nn.Module):
     """
@@ -15,12 +16,9 @@ class MultiHeadAttention(nn.Module):
         """
         cfg = self.config
 
-        q_embed = nn.Dense(features = cfg.d_k)
-        k_embed = nn.Dense(features = cfg.d_k)
-        v_embed = nn.Dense(features = cfg.d_v)
+        # final dense layer
         f_embed = nn.Dense(features = cfg.model_size)
 
-        #theorem 34 < axiom of choice
-        
+        heads = [SingleHead(cfg) for i in range(cfg.num_heads)]
 
         return
