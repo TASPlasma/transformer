@@ -6,32 +6,31 @@ from feed_forward import MLP
 class TransformerBlock(nn.Module):
     config: Config
     block: bool = True
+    mask: bool = False
+    decoder: bool = False
+
+    def setup(self):
+        cfg = self.config
+        multi_head_attn = MultiHeadAttention(cfg)
+        layer_norm = nn.LayerNorm()
+        ff = MLP(cfg, block=self.block)
 
     @nn.compact
     def __call__(self, x):
         """
         
         """
-        # setup
-        cfg = self.config
-        multi_head_attn = MultiHeadAttention(cfg)
-        # layer_norm = LayerNorm
-        layer_norm = nn.LayerNorm()
-
-        # need to distinguish this from the input embedding layer
-        ff = MLP(cfg, block=True) # want a boolean declaring this to be an MLP inside the transformer block
-        # which pulls the ff_sizes array, instead of the sizes array
 
         # To Do: Handle masking separate encoder/decoder
 
-        y = multi_head_attn(q=x, k=x, v=x)
+        y = self.multi_head_attn(q=x, k=x, v=x)
         y = y + x # add
 
-        y = layer_norm(y)
+        y = self.layer_norm(y)
 
-        x = ff(y)
+        x = self.ff(y)
         x = x + y # add
 
-        x = layer_norm(x)
+        x = self.layer_norm(x)
 
         return x

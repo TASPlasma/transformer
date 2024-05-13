@@ -5,17 +5,16 @@ class Encoder(nn.Module):
     config: Config
     mask: bool = False
 
-    @nn.compact
+    def setup(self):
+        # Create a ModuleList and add each TransformerBlock with a unique name
+        self.layers = [TransformerBlock(self.config, self.mask, name=f"layer_{i}")
+                       for i in range(self.config.num_layers)]
+
     def __call__(self, x):
         """
         x: embedded input that has already been superimposed with
         positional encoding
         """
-        # setup
-        cfg = self.config
-        layers = [TransformerBlock(cfg, self.mask) for i in cfg.num_layers]
-
-        for layer in layers:
+        for layer in self.layers:
             x = layer(x)
-        
         return x

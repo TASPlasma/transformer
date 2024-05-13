@@ -19,6 +19,12 @@ class MultiHeadAttention(nn.Module):
         # final dense layer
         f_embed = nn.Dense(features = cfg.model_size)
 
-        heads = [SingleHead(cfg) for i in range(cfg.num_heads)]
+        heads = []
 
-        return
+        for i in range(cfg.num_heads):
+            head = SingleHead(cfg, name=f'head_{i}')
+            heads.append(head(q, k, v))
+
+        output = jnp.concatenate(heads, axis=1)
+        output = f_embed(output)
+        return output

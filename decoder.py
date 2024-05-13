@@ -3,20 +3,19 @@ from transformer_block import TransformerBlock
 
 class Decoder(nn.Module):
     config: Config
-    mask: bool = True
-    decoder: bool = False
+    mask: bool = False
+    decoder: bool = True
 
-    @nn.compact
+    def setup(self):
+        # Create a ModuleList and add each TransformerBlock with a unique name
+        self.layers = [TransformerBlock(self.config, self.mask, self.decoder, name=f"layer_{i}")
+                       for i in range(self.config.num_layers)]
+
     def __call__(self, x):
         """
         x: embedded input that has already been superimposed with
         positional encoding
         """
-        # setup
-        cfg = self.config
-        layers = [TransformerBlock(cfg, self.mask, self.decoder) for i in cfg.num_layers]
-
-        for layer in layers:
+        for layer in self.layers:
             x = layer(x)
-        
         return x
