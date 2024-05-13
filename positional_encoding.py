@@ -1,6 +1,8 @@
+from dataclasses import dataclass
 from config import Config
 
-class PositionalEncoding(nn.Module):
+@dataclass
+class PositionalEncoding:
     """
     Uses np/jnp wizardry that I cooked up but barely understand
     avoids if statements/piecewise expressions via
@@ -8,10 +10,9 @@ class PositionalEncoding(nn.Module):
     """
     config: Config
 
-    @nn.compact
     def __call__(self):
         """
-        
+        none -> (seq_len, d_model)
         """
         cfg = self.config
         shape = (cfg.seq_len, cfg.model_size)

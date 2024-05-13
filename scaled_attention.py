@@ -1,9 +1,10 @@
+from dataclasses import dataclass
 from config import Config
 
-class ScaledDotProdAttention(nn.Module):
+@dataclass
+class ScaledDotProdAttention:
     config: Config
 
-    @nn.compact
     def __call__(self, q, k, v):
         """
         q: (seq_len, d_model)

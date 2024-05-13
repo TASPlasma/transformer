@@ -20,6 +20,8 @@ class Config:
     sizes: list[int] = field(default_factory = lambda: [64, 256, 512]) 
     ff_sizes: list[int] = field(default_factory = lambda: [2048, 512])
     model_size: int = 512
+    d_k: int = 64
+    d_v: int = 64
     input_dim: int = 2
     pe_bound: int = 1e4
     num_heads: int = 8
