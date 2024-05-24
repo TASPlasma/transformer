@@ -4,24 +4,21 @@ from feed_forward import MLP
 # from layer_norm import LayerNorm
 
 
-class TransformerBlock(eqx.Module):
+class EncoderBlock(eqx.Module):
     config: Config
     masked: bool = False
-    decoder: bool = False
 
     def __init__(self, key):
         cfg = self.config
-        keys = jax.random.split(key, 3)
-        self.masked_multi_attn = MultiHeadAttention(cfg, self.masked, keys[0])
-        self.multi_attn = MultiHeadAttention(cfg, keys[1])
-        self.layer_norm = nn.LayerNorm()
-        self.ff = MLP(cfg, keys[2], block=True)
+        keys = jax.random.split(key, 2)
+        self.multi_attn = MultiHeadAttention(cfg, keys[0])
+        self.layer_norm = nn.LayerNorm()  # needs input shape
+        self.ff = MLP(cfg, keys[1], block=True)
 
-    def __call__(self, x, enc_out):
+    def __call__(self, x):
         """
 
         """
-
         y = self.multi_attn(q=x, k=x, v=x)
         y = y + x  # add
 

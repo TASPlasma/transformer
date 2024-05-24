@@ -5,13 +5,15 @@ from encoder import Encoder
 from decoder import Decoder
 
 # recall (m, n) means m rows, n columns
-# Dense/Linear/Affine etc. maps input_dim to output_dim 
+# Dense/Linear/Affine etc. maps input_dim to output_dim
 # and broadcasts the rest
 # for example:
 # (1, 5) -> (1, 7) gets broadcasted to (seq_len, 5) -> (seq_len, 7)
 # (batch_size, seq_len, input_dim) -> (batch_size, seq_len, output_dim)
 
-# Needs a mask and some other shit
+# Needs a mask and some other stuff
+
+
 class Transformer(nn.Module):
     """
     model_size: dimension of domain of input embedding
@@ -26,28 +28,27 @@ class Transformer(nn.Module):
     """
     config: Config
 
+    def __init__(self, key):
+        cfg = self.config
+        keys = jax.random.split(key, 5)
+        self.embed = MLP(cfg, keys[0])  # block is default false
+        self.pos_enc = PositionalEncoding(cfg, keys[1])
+        self.encoder = Encoder(cfg, keys[2])
+        self.decoder = Decoder(cfg, keys[3])
+        self.dense = nn.Linear(features=cfg.num_classes, key=keys[4])
+
     # (seq_len, input_dim) -> (seq_len, 1)
-    @nn.compact
+
     def __call__(self, input, output):
         """
         input: the input to the encoder model (before embedded)
         possible change: add MLP into this class and only call encoder with embedded input
         output: the output
         """
-        # setup
-        cfg = self.config
-        embed = MLP(cfg) # block is default false
-        pos_enc = PositionalEncoding(cfg)
-        encoder = Encoder(cfg)
-        decoder = Decoder(cfg)
-        dense = nn.Dense(features=cfg.num_classes)
-        
-        # input = input + pos_enc(input)
-        input_emb = embed(input)
-        input_emb = input_emb + pos_enc
-        encoder_out = encoder(input_emb)
-        decoder_out = decoder(encoder_out, output)
-        logits = dense(decoder_out)
+        input_emb = self.embed(input)
+        input_emb = input_emb + self.pos_enc
+        encoder_out = self.encoder(input_emb)
+        decoder_out = self.decoder(encoder_out, output)
+        logits = self.dense(decoder_out)
 
         return logits
-        

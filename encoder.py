@@ -1,14 +1,17 @@
 from config import Config
 from transformer_block import TransformerBlock
 
-class Encoder(nn.Module):
-    config: Config
-    mask: bool = False
 
-    def setup(self):
+class Encoder(eqx.Module):
+    config: Config
+    masked: bool = False
+
+    def __init__(self, key):
         # Create a ModuleList and add each TransformerBlock with a unique name
-        self.layers = [TransformerBlock(self.config, self.mask, name=f"layer_{i}")
-                       for i in range(self.config.num_layers)]
+        cfg = self.config
+        keys = jax.random.split(key, cfg.num_layers)
+        self.layers = [TransformerBlock(cfg, self.masked, keys[i])
+                       for i in range(cfg.num_layers)]
 
     def __call__(self, x):
         """

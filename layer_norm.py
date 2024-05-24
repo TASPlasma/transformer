@@ -1,6 +1,6 @@
 from config import Config
 
-class LayerNorm(nn.Module):
+class LayerNorm(eqx.Module):
     config: Config
 
     @nn.compact

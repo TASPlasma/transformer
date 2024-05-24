@@ -1,15 +1,18 @@
 from config import Config
 from transformer_block import TransformerBlock
 
-class Decoder(nn.Module):
+
+class Decoder(eqx.Module):
     config: Config
-    mask: bool = False
+    masked: bool = False
     decoder: bool = True
 
-    def setup(self):
+    def __init__(self, key):
         # Create a ModuleList and add each TransformerBlock with a unique name
-        self.layers = [TransformerBlock(self.config, self.mask, self.decoder, name=f"layer_{i}")
-                       for i in range(self.config.num_layers)]
+        cfg = self.config
+        keys = jax.random.split(key, cfg.num_layers)
+        self.layers = [TransformerBlock(cfg, self.masked, self.decoder, keys[i])
+                       for i in range(cfg.num_layers)]
 
     def __call__(self, x):
         """

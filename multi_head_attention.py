@@ -1,30 +1,35 @@
 from config import Config
 from single_head import SingleHead
 
-class MultiHeadAttention(nn.Module):
-    """
-    q: (seq_len, d_model)
-    k: (seq_len, d_model)
-    v: (seq_len, d_model)
+
+class MultiHeadAttention(eqx.Module):
     """
     config: Config
+    masked: bool (needs to be a function actually)
+    decoder: bool
 
-    @nn.compact
+    forward: (seq_len, d_model)^3 -> (seq_len, d_model)
+    """
+    config: Config
+    masked: bool = False
+    decoder: bool = False
+
+    def __init__(self, key):
+        cfg = self.config
+        keys = jax.random.split(key, cfg.num_heads+1)
+
+        # final dense layer
+        self.f_embed = nn.Linear(features=cfg.model_size, key=keys[0])
+        self.head_layers = [SingleHead(cfg, key=keys[i+1])
+                            for i in range(cfg.num_heads)]
+
     def __call__(self, q, k, v):
         """
         (seq_len, d_model)^3 -> (seq_len, d_model)
         """
-        cfg = self.config
 
-        # final dense layer
-        f_embed = nn.Dense(features = cfg.model_size)
-
-        heads = []
-
-        for i in range(cfg.num_heads):
-            head = SingleHead(cfg, name=f'head_{i}')
-            heads.append(head(q, k, v))
+        heads = [head_layer(q, k, v) for head_layer in self.head_layers]
 
         output = jnp.concatenate(heads, axis=1)
-        output = f_embed(output)
+        output = self.f_embed(output)
         return output
