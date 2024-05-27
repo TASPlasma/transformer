@@ -26,6 +26,7 @@ class MultiHeadAttention(eqx.Module):
 
     def __call__(self, q, k, v):
         """
+        q, k, v
         (seq_len, d_model)^3 -> (seq_len, d_model)
         """
 

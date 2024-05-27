@@ -8,7 +8,7 @@ class ScaledDotProdAttention:
     masked: bool = False
     decoder: bool = False
 
-    def __call__(self, q, k, v):
+    def __call__(self, q, k, v, mask=None):
         """
         q: (seq_len, d_model)
         k: (seq_len, d_model)
@@ -17,7 +17,14 @@ class ScaledDotProdAttention:
         cfg = self.config
         d_k = q.shape[-1]
 
-        scaled_logits = (q * k.transpose()) / jnp.sqrt(d_k)
+        # q: (seq_len, d_model), k.T (d_model, seq_len)
+        qk_matmul = jnp.matmul(q, k.T)  # (seq_len, seq_len)
+
+        scaled_logits = (qk_matmul) / jnp.sqrt(d_k)
+
+        if mask is not None:
+            # apply mask here
+            scaled_logits += (mask - 1) * 1e9
 
         attn = nn.softmax(scaled_logits) * v
 

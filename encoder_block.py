@@ -17,7 +17,7 @@ class EncoderBlock(eqx.Module):
 
     def __call__(self, x):
         """
-
+        (seq_len, d_model) -> (seq_len, d_model)
         """
         y = self.multi_attn(q=x, k=x, v=x)
         y = y + x  # add

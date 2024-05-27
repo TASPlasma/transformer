@@ -60,7 +60,7 @@ class Transformer(nn.Module):
 
         return logits
 
-    def create_pad_mask(self, input, pad_value=0):
+    def create_pad_mask(self, input):
         """
         Creates a mask on padded values
         (seq_len, input_dim) -> {0, 1}^seq_len
@@ -73,7 +73,8 @@ class Transformer(nn.Module):
         |->
         [1, 1, 0] (or [True, True, False], True when a row is not a padded row)
         """
-        return
+        mask = jnp.sum(jnp.abs(input), axis=-1) != 0
+        return mask.astype(int)
 
     def create_look_ahead_mask(self, output):
         """

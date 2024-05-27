@@ -4,7 +4,7 @@ from feed_forward import MLP
 # from layer_norm import LayerNorm
 
 
-class TransformerBlock(eqx.Module):
+class DecoderBlock(eqx.Module):
     config: Config
     masked: bool = False
 
@@ -18,7 +18,8 @@ class TransformerBlock(eqx.Module):
 
     def __call__(self, x, enc_out):
         """
-
+        Needs an input x, and the output of the encoder enc_out.
+        (seq_len, d_model) x (seq_len, d_model) -> (seq_len, d_model)
         """
 
         y = self.masked_multi_attn(q=x, k=x, v=x)
