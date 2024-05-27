@@ -32,6 +32,10 @@ class Transformer(nn.Module):
         cfg = self.config
         keys = jax.random.split(key, 5)
         self.embed = MLP(cfg, keys[0])  # block is default false
+
+        # needs to use vmap
+        # self.embed = nn.Linear(in_features=cfg.input_dim,
+        #                        out_features=cfg.model_size, use_bias=False)
         self.pos_enc = PositionalEncoding(cfg, keys[1])
         self.encoder = Encoder(cfg, keys[2])
         self.decoder = Decoder(cfg, keys[3])
@@ -42,13 +46,38 @@ class Transformer(nn.Module):
     def __call__(self, input, output):
         """
         input: the input to the encoder model (before embedded)
-        possible change: add MLP into this class and only call encoder with embedded input
         output: the output
+
+        (seq_len, input_dim) x output_shape -> {num_classes}^(seq_len)
         """
-        input_emb = self.embed(input)
-        input_emb = input_emb + self.pos_enc
-        encoder_out = self.encoder(input_emb)
-        decoder_out = self.decoder(encoder_out, output)
+        pad_mask = self.create_pad_mask(input)
+        look_ahead_mask = self.create_look_ahead_mask(output)
+        input_emb = jax.vmap(self.embed)(input)
+        input_emb = input_emb + self.pos_enc()
+        encoder_out = self.encoder(input_emb, pad_mask)
+        decoder_out = self.decoder(encoder_out, output, look_ahead_mask)
         logits = self.dense(decoder_out)
 
         return logits
+
+    def create_pad_mask(self, input, pad_value=0):
+        """
+        Creates a mask on padded values
+        (seq_len, input_dim) -> {0, 1}^seq_len
+
+        e.g. max_seq_len = 3, input_dim = 2,
+        input = 
+        [[0.3, 1.0],
+        [0.2, -0.4],
+        [0.0, 0.0]]
+        |->
+        [1, 1, 0] (or [True, True, False], True when a row is not a padded row)
+        """
+        return
+
+    def create_look_ahead_mask(self, output):
+        """
+        Creates a look ahead mask
+        to prevent decoder from cheating in training
+        """
+        return

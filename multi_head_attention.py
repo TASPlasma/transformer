@@ -19,7 +19,8 @@ class MultiHeadAttention(eqx.Module):
         keys = jax.random.split(key, cfg.num_heads+1)
 
         # final dense layer
-        self.f_embed = nn.Linear(features=cfg.model_size, key=keys[0])
+        self.f_embed = nn.Linear(
+            in_features=cfg.num_heads * cfg.d_v, out_features=cfg.model_size, key=keys[0])
         self.head_layers = [SingleHead(cfg, key=keys[i+1])
                             for i in range(cfg.num_heads)]
 
@@ -31,5 +32,5 @@ class MultiHeadAttention(eqx.Module):
         heads = [head_layer(q, k, v) for head_layer in self.head_layers]
 
         output = jnp.concatenate(heads, axis=1)
-        output = self.f_embed(output)
+        output = jax.vmap(self.f_embed)(output)
         return output

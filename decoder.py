@@ -3,6 +3,7 @@ from transformer_block import TransformerBlock
 
 
 class Decoder(eqx.Module):
+    # needs a look-ahead mask
     config: Config
     masked: bool = False
     decoder: bool = True
