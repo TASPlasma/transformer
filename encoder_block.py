@@ -15,11 +15,11 @@ class EncoderBlock(eqx.Module):
         self.layer_norm = nn.LayerNorm()  # needs input shape
         self.ff = MLP(cfg, keys[1], block=True)
 
-    def __call__(self, x):
+    def __call__(self, x, mask):
         """
         (seq_len, d_model) -> (seq_len, d_model)
         """
-        y = self.multi_attn(q=x, k=x, v=x)
+        y = self.multi_attn(q=x, k=x, v=x, mask=mask)
         y = y + x  # add
 
         y = self.layer_norm(y)

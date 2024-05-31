@@ -75,10 +75,3 @@ class Transformer(nn.Module):
         """
         mask = jnp.sum(jnp.abs(input), axis=-1) != 0
         return mask.astype(int)
-
-    def create_look_ahead_mask(self, output):
-        """
-        Creates a look ahead mask
-        to prevent decoder from cheating in training
-        """
-        return

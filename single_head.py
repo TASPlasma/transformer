@@ -24,15 +24,17 @@ class SingleHead(eqx.Module):
             in_features=cfg.model_size, out_features=cfg.d_v, key=keys[2])
         self.attn = ScaledDotProdAttention(cfg, self.masked, self.decoder)
 
-    def __call__(self, q, k, v):
+    def __call__(self, q, k, v, mask):
         """
+        q, k, v: (seq_len, d_model)
         (seq_len, d_model)^3 -> (seq_len, d_v)
+        mask: padding mask
         """
 
         q_embed = jax.vmap(self.q_layer)(q)
         k_embed = jax.vmap(self.k_layer)(k)
         v_embed = jax.vmap(self.v_layer)(v)
 
-        head = self.attn(q_embed, k_embed, v_embed)
+        head = self.attn(q_embed, k_embed, v_embed, mask)
 
         return head
