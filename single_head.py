@@ -1,3 +1,6 @@
+import jax
+import equinox as eqx
+import equinox.nn as nn
 from config import Config
 from scaled_attention import ScaledDotProdAttention
 

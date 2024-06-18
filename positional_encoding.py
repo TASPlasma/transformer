@@ -1,3 +1,4 @@
+import jax.numpy as jnp
 from dataclasses import dataclass
 from config import Config
 

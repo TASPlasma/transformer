@@ -1,3 +1,7 @@
+import jax
+import equinox as eqx
+import equinox.nn as nn
+import jax.numpy as jnp
 from dataclasses import dataclass
 from config import Config
 
@@ -36,6 +40,6 @@ class ScaledDotProdAttention:
             look_ahead_mask = jnp.triu(jnp.ones(cfg.seq_len, cfg.seq_len), k=1)
             scaled_logits += -look_ahead_mask * 1e9
 
-        attn = nn.softmax(scaled_logits) * v
+        attn = jax.nn.softmax(scaled_logits) * v
 
         return attn

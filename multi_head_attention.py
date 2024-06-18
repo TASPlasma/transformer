@@ -1,3 +1,7 @@
+import jax
+import equinox as eqx
+import equinox.nn as nn
+import jax.numpy as jnp
 from config import Config
 from single_head import SingleHead
 

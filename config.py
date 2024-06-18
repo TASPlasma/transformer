@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 
+
 @dataclass
 class Config:
     """
@@ -17,8 +18,8 @@ class Config:
     for example, num_classes=2 means binary classification
     -seed: rng seed
     """
-    sizes: list[int] = field(default_factory = lambda: [64, 256, 512]) 
-    ff_sizes: list[int] = field(default_factory = lambda: [2048, 512])
+    sizes: list[int] = field(default_factory=lambda: [64, 256, 512])
+    ff_sizes: list[int] = field(default_factory=lambda: [2048, 512])
     model_size: int = 512
     d_k: int = 64
     d_v: int = 64
@@ -30,6 +31,3 @@ class Config:
     dropout_rate: float = 0.1
     num_classes: int = 15
     seed: int = 0
-
-config = Config(sizes=[64, 256, 512])
-print(config.model_size)
