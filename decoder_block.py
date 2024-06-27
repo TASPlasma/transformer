@@ -8,18 +8,17 @@ from feed_forward import MLP
 
 
 class DecoderBlock(eqx.Module):
-    config: Config
-    masked: bool = False
 
-    def __init__(self, key):
-        cfg = self.config
+    def __init__(self, config: Config, key=None, masked: bool = False):
+        cfg = config
         keys = jax.random.split(key, 3)
-        self.masked_multi_attn = MultiHeadAttention(cfg, self.masked, keys[0])
+        self.masked = masked
+        self.masked_multi_attn = MultiHeadAttention(cfg, keys[0], self.masked)
         self.multi_attn = MultiHeadAttention(cfg, keys[1])
         self.layer_norm = nn.LayerNorm(shape=(cfg.seq_len, cfg.model_size))
         self.ff = MLP(cfg, keys[2], block=True)
 
-    def __call__(self, x, enc_out, mask=None):
+    def __call__(self, enc_out, x, mask=None):
         """
         Needs an input x, and the output of the encoder enc_out.
         (seq_len, d_model) x (seq_len, d_model) -> (seq_len, d_model)

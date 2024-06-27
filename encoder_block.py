@@ -8,14 +8,13 @@ from feed_forward import MLP
 
 
 class EncoderBlock(eqx.Module):
-    config: Config
-    masked: bool = False
 
-    def __init__(self, key):
-        cfg = self.config
+    def __init__(self, config: Config, key=None):
+        cfg = config
         keys = jax.random.split(key, 2)
         self.multi_attn = MultiHeadAttention(cfg, keys[0])
-        self.layer_norm = nn.LayerNorm()  # needs input shape
+        self.layer_norm = nn.LayerNorm(
+            shape=(cfg.seq_len, cfg.model_size))  # needs input shape
         self.ff = MLP(cfg, keys[1], block=True)
 
     def __call__(self, x, mask):
