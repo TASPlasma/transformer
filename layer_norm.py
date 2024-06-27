@@ -2,14 +2,14 @@ import equinox as eqx
 import equinox.nn as nn
 import jax.numpy as jnp
 from config import Config
+from dataclasses import dataclass
 
 
 class LayerNorm(eqx.Module):
-    config: Config
 
-    def __call__(self):
+    def __call__(self, config: Config):
         """
 
         """
-        cfg = self.config
+        cfg = config
         pass

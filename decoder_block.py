@@ -8,12 +8,15 @@ from feed_forward import MLP
 
 
 class DecoderBlock(eqx.Module):
+    masked_multi_attn: eqx.Module
+    multi_attn: eqx.Module
+    layer_norm: nn.LayerNorm
+    ff: eqx.Module
 
     def __init__(self, config: Config, key=None, masked: bool = False):
         cfg = config
         keys = jax.random.split(key, 3)
-        self.masked = masked
-        self.masked_multi_attn = MultiHeadAttention(cfg, keys[0], self.masked)
+        self.masked_multi_attn = MultiHeadAttention(cfg, keys[0], masked)
         self.multi_attn = MultiHeadAttention(cfg, keys[1])
         self.layer_norm = nn.LayerNorm(shape=(cfg.seq_len, cfg.model_size))
         self.ff = MLP(cfg, keys[2], block=True)
@@ -23,7 +26,6 @@ class DecoderBlock(eqx.Module):
         Needs an input x, and the output of the encoder enc_out.
         (seq_len, d_model) x (seq_len, d_model) -> (seq_len, d_model)
         """
-
         y = self.masked_multi_attn(q=x, k=x, v=x, mask=mask)
         y = y + x  # add
         y = self.layer_norm(y)
@@ -32,7 +34,7 @@ class DecoderBlock(eqx.Module):
         x = x + y
         x = self.layer_norm(x)
 
-        y = self.ff(x)
+        y = jax.vmap(self.ff)(x)
         y = x + y  # add
 
         y = self.layer_norm(y)

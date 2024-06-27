@@ -11,12 +11,13 @@ class SingleHead(eqx.Module):
     k: (seq_len, d_model)
     v: (seq_len, d_model)
     """
-    config: Config
-    masked: bool = False
-    decoder: bool = False
+    q_layer: nn.Linear
+    k_layer: nn.Linear
+    v_layer: nn.Linear
+    attn: ScaledDotProdAttention
 
-    def __init__(self, key):
-        cfg = self.config
+    def __init__(self, config: Config, key=None, masked: bool = False):
+        cfg = config
         keys = jax.random.split(key, 3)
 
         self.q_layer = nn.Linear(
@@ -25,7 +26,7 @@ class SingleHead(eqx.Module):
             in_features=cfg.model_size, out_features=cfg.d_k, key=keys[1])
         self.v_layer = nn.Linear(
             in_features=cfg.model_size, out_features=cfg.d_v, key=keys[2])
-        self.attn = ScaledDotProdAttention(cfg, self.masked, self.decoder)
+        self.attn = ScaledDotProdAttention(cfg, masked)
 
     def __call__(self, q, k, v, mask):
         """
@@ -33,7 +34,6 @@ class SingleHead(eqx.Module):
         (seq_len, d_model)^3 -> (seq_len, d_v)
         mask: padding mask
         """
-
         q_embed = jax.vmap(self.q_layer)(q)
         k_embed = jax.vmap(self.k_layer)(k)
         v_embed = jax.vmap(self.v_layer)(v)

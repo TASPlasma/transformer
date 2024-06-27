@@ -8,6 +8,9 @@ from feed_forward import MLP
 
 
 class EncoderBlock(eqx.Module):
+    multi_attn: eqx.Module
+    layer_norm: nn.LayerNorm
+    ff: eqx.Module
 
     def __init__(self, config: Config, key=None):
         cfg = config
@@ -26,7 +29,8 @@ class EncoderBlock(eqx.Module):
 
         y = self.layer_norm(y)
 
-        x = self.ff(y)
+        x = jax.vmap(self.ff)(y)
+
         x = x + y  # add
 
         x = self.layer_norm(x)

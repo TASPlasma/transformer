@@ -1,15 +1,17 @@
+import jax
+import equinox as eqx
+import equinox.nn as nn
 from config import Config
 from encoder_block import EncoderBlock
 
 
 class Encoder(eqx.Module):
-    config: Config
-    masked: bool = False
+    layers: list
 
-    def __init__(self, key):
-        cfg = self.config
+    def __init__(self, config: Config, key=None, masked: bool = False):
+        cfg = config
         keys = jax.random.split(key, cfg.num_layers)
-        self.layers = [EncoderBlock(cfg, self.masked, keys[i])
+        self.layers = [EncoderBlock(cfg, keys[i])
                        for i in range(cfg.num_layers)]
 
     def __call__(self, x, mask):

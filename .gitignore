@@ -1,3 +1,4 @@
 *.pyc
 ml/
 __pycache__/
+.env
