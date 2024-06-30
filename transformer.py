@@ -8,15 +8,6 @@ from positional_encoding import PositionalEncoding
 from encoder import Encoder
 from decoder import Decoder
 
-# recall (m, n) means m rows, n columns
-# Dense/Linear/Affine etc. maps input_dim to output_dim
-# and broadcasts the rest
-# for example:
-# (1, 5) -> (1, 7) gets broadcasted to (seq_len, 5) -> (seq_len, 7)
-# (batch_size, seq_len, input_dim) -> (batch_size, seq_len, output_dim)
-
-# Needs a mask and some other stuff
-
 
 class Transformer(eqx.Module):
     """
@@ -85,16 +76,3 @@ class Transformer(eqx.Module):
         """
         mask = jnp.sum(jnp.abs(input), axis=-1) != 0
         return mask.astype(int)
-
-
-# cfg = Config()
-# in_shape = (cfg.seq_len, cfg.input_dim)
-# arr = jnp.ones(in_shape)
-# key = jax.random.PRNGKey(0)
-# keys = jax.random.split(key, 3)
-# first_key = keys[0]
-# print(f'key: {first_key}, input shape: {arr.shape}')
-
-
-# model = Transformer(cfg, key=key)
-# print(f'model output: {model(arr, arr)}')

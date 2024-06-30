@@ -4,7 +4,6 @@ import equinox.nn as nn
 from config import Config
 from multi_head_attention import MultiHeadAttention
 from feed_forward import MLP
-# from layer_norm import LayerNorm
 
 
 class EncoderBlock(eqx.Module):
@@ -17,7 +16,7 @@ class EncoderBlock(eqx.Module):
         keys = jax.random.split(key, 2)
         self.multi_attn = MultiHeadAttention(cfg, keys[0])
         self.layer_norm = nn.LayerNorm(
-            shape=(cfg.seq_len, cfg.model_size))  # needs input shape
+            shape=(cfg.seq_len, cfg.model_size))
         self.ff = MLP(cfg, keys[1], block=True)
 
     def __call__(self, x, mask):
