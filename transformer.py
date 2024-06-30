@@ -40,8 +40,6 @@ class Transformer(eqx.Module):
         self.dense = nn.Linear(in_features=cfg.model_size,
                                out_features=cfg.num_classes, key=keys[2])
 
-    # (seq_len, input_dim) -> (seq_len, 1)
-
     def __call__(self, input, output):
         """
         input: the input to the encoder model (before embedded)

@@ -6,7 +6,7 @@ from config import Config
 @dataclass
 class PositionalEncoding:
     """
-    Uses np/jnp wizardry that I cooked up but barely understand
+    Positional encoding as in Attention Is All You Need
     avoids if statements/piecewise expressions via
     modulo 2 logic
     """

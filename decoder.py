@@ -9,7 +9,6 @@ class Decoder(eqx.Module):
     layers: list
 
     def __init__(self, config: Config, key=None, masked: bool = False):
-        # Create a ModuleList and add each TransformerBlock with a unique name
         cfg = config
         keys = jax.random.split(key, cfg.num_layers)
         self.layers = [DecoderBlock(cfg, key=keys[i], masked=masked)

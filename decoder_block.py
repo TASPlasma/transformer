@@ -4,7 +4,6 @@ import equinox.nn as nn
 from config import Config
 from multi_head_attention import MultiHeadAttention
 from feed_forward import MLP
-# from layer_norm import LayerNorm
 
 
 class DecoderBlock(eqx.Module):

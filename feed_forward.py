@@ -6,6 +6,12 @@ from config import Config
 
 
 class MLP(eqx.Module):
+    """
+    Standard MLP neural network.
+    Used to both embed the input to d_model
+    and for the feed-forward portion of the transformer blocks
+    block: if true indicates this is for a transformer block
+    """
     layers: list
 
     def __init__(self, config: Config, key=None, block: bool = False):

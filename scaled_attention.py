@@ -16,9 +16,9 @@ class ScaledDotProdAttention:
 
     def __call__(self, q, k, v, mask=None):
         """
-        q: (seq_len, d_model)
-        k: (seq_len, d_model)
-        v: (seq_len, d_model)
+        q: (seq_len, d_model) or (seq_len, d_k)
+        k: (seq_len, d_model) or (seq_len, d_k)
+        v: (seq_len, d_model) or (seq_len, d_v)
         """
         cfg = self.config
         d_k = q.shape[-1]

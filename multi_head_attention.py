@@ -10,7 +10,6 @@ class MultiHeadAttention(eqx.Module):
     """
     config: Config
     masked: bool indicating if a look ahead masked is to be used
-    decoder: bool
 
     forward: (seq_len, d_model)^3 -> (seq_len, d_model)
     """
