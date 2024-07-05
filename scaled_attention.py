@@ -1,6 +1,4 @@
 import jax
-import equinox as eqx
-import equinox.nn as nn
 import jax.numpy as jnp
 from dataclasses import dataclass
 from config import Config
