@@ -18,7 +18,7 @@ setup(
         'jaxlib==0.4.30',
         'jaxtyping==0.2.30',
         'ml-dtypes==0.4.0',
-        'numpy==2.0.0',
+        'numpy==1.24.1',
         'opt-einsum==3.3.0',
         'optax==0.2.2',
         'scipy==1.13.1',
