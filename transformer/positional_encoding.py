@@ -1,16 +1,19 @@
 import jax.numpy as jnp
+import equinox as eqx
 from dataclasses import dataclass
 from .config import Config
 
 
 @dataclass
-class PositionalEncoding:
+class PositionalEncoding(eqx.Module):
     """
     Positional encoding as in Attention Is All You Need
     avoids if statements/piecewise expressions via
     modulo 2 logic
     """
-    config: Config
+
+    def __init__(self, config: Config):
+        self.config = config
 
     def __call__(self):
         """
