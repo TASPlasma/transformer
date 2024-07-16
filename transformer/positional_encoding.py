@@ -1,3 +1,4 @@
+import jax
 import jax.numpy as jnp
 import equinox as eqx
 from dataclasses import dataclass
@@ -11,6 +12,7 @@ class PositionalEncoding(eqx.Module):
     avoids if statements/piecewise expressions via
     modulo 2 logic
     """
+    pe: jax.Array
 
     def __init__(self, config: Config):
         self.config = config
@@ -24,9 +26,9 @@ class PositionalEncoding(eqx.Module):
         pos = jnp.arange(0, cfg.seq_len)[:, jnp.newaxis] * jnp.ones(shape)
         dims = jnp.arange(0, cfg.model_size) * jnp.ones(shape)
 
-        pe = (dims % 2 == 0) * \
+        self.pe = (dims % 2 == 0) * \
             (jnp.sin(pos/(cfg.pe_bound ** (dims / cfg.model_size))))
-        pe = pe + (dims % 2 == 1) * \
+        self.pe = self.pe + (dims % 2 == 1) * \
             (jnp.cos(pos/(cfg.pe_bound ** ((dims - 1) / cfg.model_size))))
 
-        return pe
+        return self.pe
