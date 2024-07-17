@@ -15,7 +15,7 @@ class Config:
     num_layers: int = 6
     seq_len: int = 55
     dropout_rate: float = 0.1
-    num_classes: int = 15
+    num_classes: int = 7
     seed: int = 0
 
     def __post_init__(self):
@@ -24,3 +24,6 @@ class Config:
         if self.out_dim is None:
             self.out_dim = self.num_classes
         self.model_size = self.d_v * self.num_heads
+
+    def __hash__(self):
+        return str(self)
