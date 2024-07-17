@@ -13,10 +13,11 @@ class PositionalEncoding(eqx.Module):
     config: Config
     pe: jax.Array
 
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, key):
         super().__init__()
         self.config = config
         self.pe = self._calculate_pe()
+        self.pe = jax.random.normal(key, (self.config.model_size, ))
 
     def _calculate_pe(self):
         cfg = self.config
@@ -31,8 +32,8 @@ class PositionalEncoding(eqx.Module):
 
         return pe
 
-    def __call__(self):
+    def __call__(self, x):
         """
         none -> (seq_len, d_model)
         """
-        return self.pe
+        return x + self.pe

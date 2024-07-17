@@ -21,7 +21,7 @@ class Transformer(eqx.Module):
     for example, num_classes=2 means binary classification
     sizes: dimensions to map input_dim to input_embedding via MLP
     """
-    pos_enc: PositionalEncoding
+    pos_enc: eqx.Module
     in_embed: eqx.Module
     out_embed: eqx.Module
     encoder: eqx.Module
@@ -33,10 +33,10 @@ class Transformer(eqx.Module):
             key = jax.random.PRNGKey(0)
         cfg = config
         self.in_embed = MLP(cfg, key=key)  # block is default false
-        keys = list(jax.random.split(key, 4))
+        keys = list(jax.random.split(key, 5))
         self.out_embed = MLP(cfg, key=keys[3], out_emb=True)
 
-        self.pos_enc = PositionalEncoding(cfg)
+        self.pos_enc = PositionalEncoding(cfg, key=keys[4])
         self.encoder = Encoder(cfg, key=keys[0])
         self.decoder = Decoder(cfg, key=keys[1], masked=True)
         self.dense = nn.Linear(in_features=cfg.model_size,
@@ -52,10 +52,10 @@ class Transformer(eqx.Module):
         in_pad_mask = self.create_pad_mask(input)
         out_pad_mask = self.create_pad_mask(output)
         input_emb = jax.vmap(self.in_embed)(input)
-        input_emb = input_emb + self.pos_enc()
+        input_emb = jax.vmap(self.pos_enc)(input_emb)
         encoder_out = self.encoder(input_emb, in_pad_mask)
         output_emb = jax.vmap(self.out_embed)(output)
-        output_emb = output_emb + self.pos_enc()
+        output_emb = jax.vmap(self.pos_enc)(output_emb)
         decoder_out = self.decoder(encoder_out, output_emb, out_pad_mask)
         logits = jax.vmap(self.dense)(decoder_out)
 
