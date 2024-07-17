@@ -15,7 +15,7 @@ class Config:
     num_layers: int = 6
     seq_len: int = 55
     dropout_rate: float = 0.1
-    num_classes: int = 7
+    num_classes: int = 8
     seed: int = 0
 
     def __post_init__(self):
