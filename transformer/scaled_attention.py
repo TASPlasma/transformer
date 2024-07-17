@@ -1,16 +1,20 @@
 import jax
 import jax.numpy as jnp
+import equinox as eqx
 from dataclasses import dataclass
 from .config import Config
 
 
-@dataclass
-class ScaledDotProdAttention:
+class ScaledDotProdAttention(eqx.Module):
     """
     masked: boolean for look-ahead mask
     """
-    config: Config
-    masked: bool = False
+    cfg: Config
+    masked: bool
+
+    def __init__(self, config: Config, masked: bool = False):
+        self.cfg = config
+        self.masked = masked
 
     def __call__(self, q, k, v, mask=None):
         """
@@ -18,7 +22,7 @@ class ScaledDotProdAttention:
         k: (seq_len, d_model) or (seq_len, d_k)
         v: (seq_len, d_model) or (seq_len, d_v)
         """
-        cfg = self.config
+
         d_k = q.shape[-1]
 
         # q: (seq_len, d_model), k.T: (d_model, seq_len)
@@ -32,7 +36,7 @@ class ScaledDotProdAttention:
 
         if self.masked:
             look_ahead_mask = jnp.triu(
-                jnp.ones(shape=(cfg.seq_len, cfg.seq_len)), k=1)
+                jnp.ones(shape=(self.cfg.seq_len, self.cfg.seq_len)), k=1)
             scaled_logits -= look_ahead_mask * 1e9
 
         attn = jnp.matmul(jax.nn.softmax(scaled_logits), v)

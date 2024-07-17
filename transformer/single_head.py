@@ -14,7 +14,7 @@ class SingleHead(eqx.Module):
     q_layer: nn.Linear
     k_layer: nn.Linear
     v_layer: nn.Linear
-    attn: ScaledDotProdAttention
+    attn: eqx.Module
 
     def __init__(self, config: Config, key=None, masked: bool = False):
         cfg = config
