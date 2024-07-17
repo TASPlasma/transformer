@@ -24,6 +24,8 @@ class Config:
         if self.out_dim is None:
             self.out_dim = self.num_classes
         self.model_size = self.d_v * self.num_heads
+        self.sizes[-1] = self.model_size
+        self.ff_sizes[-1] = self.model_size
 
     def __hash__(self):
         return str(self)
