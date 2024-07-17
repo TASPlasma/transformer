@@ -22,7 +22,8 @@ class Transformer(eqx.Module):
     sizes: dimensions to map input_dim to input_embedding via MLP
     """
     pos_enc: PositionalEncoding
-    embed: eqx.Module
+    in_embed: eqx.Module
+    out_embed: eqx.Module
     encoder: eqx.Module
     decoder: eqx.Module
     dense: nn.Linear
@@ -31,8 +32,9 @@ class Transformer(eqx.Module):
         if key is None:
             key = jax.random.PRNGKey(0)
         cfg = config
-        self.embed = MLP(cfg, key=key)  # block is default false
-        keys = list(jax.random.split(key, 3))
+        self.in_embed = MLP(cfg, key=key)  # block is default false
+        keys = list(jax.random.split(key, 4))
+        self.out_embed = MLP(cfg, key=keys[3], out_emb=True)
 
         self.pos_enc = PositionalEncoding(cfg)
         self.encoder = Encoder(cfg, key=keys[0])
@@ -49,10 +51,10 @@ class Transformer(eqx.Module):
         """
         in_pad_mask = self.create_pad_mask(input)
         out_pad_mask = self.create_pad_mask(output)
-        input_emb = jax.vmap(self.embed)(input)
+        input_emb = jax.vmap(self.in_embed)(input)
         input_emb = input_emb + self.pos_enc()
         encoder_out = self.encoder(input_emb, in_pad_mask)
-        output_emb = jax.vmap(self.embed)(output)
+        output_emb = jax.vmap(self.out_embed)(output)
         output_emb = output_emb + self.pos_enc()
         decoder_out = self.decoder(encoder_out, output_emb, out_pad_mask)
         logits = jax.vmap(self.dense)(decoder_out)

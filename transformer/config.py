@@ -9,6 +9,7 @@ class Config:
     d_k: int = 64
     d_v: Optional[int] = None
     input_dim: int = 2
+    out_dim: Optional[int] = None
     pe_bound: int = 1e4
     num_heads: int = 8
     num_layers: int = 6
@@ -20,4 +21,6 @@ class Config:
     def __post_init__(self):
         if self.d_v is None:
             self.d_v = self.d_k
+        if self.out_dim is None:
+            self.out_dim = self.num_classes
         self.model_size = self.d_v * self.num_heads

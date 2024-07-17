@@ -13,10 +13,16 @@ class MLP(eqx.Module):
     """
     layers: list
 
-    def __init__(self, config: Config, key=None, block: bool = False):
+    def __init__(self, config: Config, key=None, block: bool = False, out_emb: bool = False):
         cfg = config
         array_sizes = cfg.ff_sizes if block else cfg.sizes
-        in_size = cfg.model_size if block else cfg.input_dim
+        if block:
+            in_size = cfg.model_size
+        elif out_emb:
+            in_size = cfg.out_dim
+        else:
+            in_size = cfg.input_dim
+
         keys = jax.random.split(key, len(array_sizes))
 
         first_layer = nn.Linear(in_size, array_sizes[0], key=keys[0])
