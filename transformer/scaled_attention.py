@@ -2,6 +2,7 @@ import jax
 import jax.numpy as jnp
 import equinox as eqx
 from dataclasses import dataclass
+from typing import Tuple
 from .config import Config
 
 
@@ -9,12 +10,12 @@ class ScaledDotProdAttention(eqx.Module):
     """
     masked: boolean for look-ahead mask
     """
-    cfg: Config
     masked: bool
+    shape: Tuple
 
     def __init__(self, config: Config, masked: bool = False):
-        self.cfg = config
         self.masked = masked
+        self.shape = (config.seq_len, config.seq_len)
 
     def __call__(self, q, k, v, mask=None):
         """
@@ -36,7 +37,7 @@ class ScaledDotProdAttention(eqx.Module):
 
         if self.masked:
             look_ahead_mask = jnp.triu(
-                jnp.ones(shape=(self.cfg.seq_len, self.cfg.seq_len)), k=1)
+                jnp.ones(shape=self.shape), k=1)
             scaled_logits -= look_ahead_mask * 1e9
 
         attn = jnp.matmul(jax.nn.softmax(scaled_logits), v)
