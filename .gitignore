@@ -3,3 +3,5 @@ ml/
 __pycache__/
 .env
 .vscode/settings.json
+output.txt
+main.py

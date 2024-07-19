@@ -21,7 +21,7 @@ setup(
         'numpy==1.24.1',
         'opt-einsum==3.3.0',
         'optax==0.2.2',
-        'scipy==1.13.1',
+        'scipy==1.12.0',
         'toolz==0.12.1',
         'typeguard==2.13.3',
         'typing_extensions==4.12.2'
