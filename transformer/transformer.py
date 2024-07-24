@@ -47,7 +47,7 @@ class Transformer(eqx.Module):
         input: the input to the encoder model (before embedded)
         output: the output
 
-        (seq_len, input_dim) x output_shape -> {num_classes}^(seq_len)
+        (seq_len, input_dim) x (seq_len, num_classes) -> {num_classes}^(seq_len)
         """
         in_pad_mask = self.create_pad_mask(input)
         out_pad_mask = self.create_pad_mask(output)
