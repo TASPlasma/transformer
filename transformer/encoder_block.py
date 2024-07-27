@@ -23,6 +23,7 @@ class EncoderBlock(eqx.Module):
         """
         (seq_len, d_model) -> (seq_len, d_model)
         """
+        print(f'{x.shape=}, {mask.shape=}')
         y = self.multi_attn(q=x, k=x, v=x, mask=mask)
         y = y + x  # add
 

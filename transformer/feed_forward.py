@@ -12,16 +12,27 @@ class MLP(eqx.Module):
     block: if true indicates this is for a transformer block
     """
     layers: list
+    debug_msg: str
 
-    def __init__(self, config: Config, key=None, block: bool = False, out_emb: bool = False):
+    def __init__(
+        self,
+        config: Config,
+        key=None,
+        block: bool = False,
+        out_emb: bool = False,
+        state: bool = False,
+    ):
         cfg = config
-        array_sizes = cfg.ff_sizes if block else cfg.sizes
+        array_sizes, in_size = cfg.sizes, cfg.input_dim
         if block:
+            array_sizes = cfg.ff_sizes
             in_size = cfg.model_size
+        elif state:
+            array_sizes = cfg.state_sizes
+            in_size = cfg.state_in_dim
         elif out_emb:
+            array_sizes = cfg.ff_sizes
             in_size = cfg.out_dim
-        else:
-            in_size = cfg.input_dim
 
         keys = jax.random.split(key, len(array_sizes))
 
