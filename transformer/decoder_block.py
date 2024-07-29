@@ -17,7 +17,7 @@ class DecoderBlock(eqx.Module):
         keys = jax.random.split(key, 3)
         self.masked_multi_attn = MultiHeadAttention(cfg, keys[0], masked)
         self.multi_attn = MultiHeadAttention(cfg, keys[1])
-        self.layer_norm = nn.LayerNorm(shape=(cfg.seq_len, cfg.model_size))
+        self.layer_norm = nn.LayerNorm(shape=cfg.model_size)
         self.ff = MLP(cfg, keys[2], block=True)
 
     def __call__(self, enc_out, x, mask=None):
@@ -27,15 +27,15 @@ class DecoderBlock(eqx.Module):
         """
         y = self.masked_multi_attn(q=x, k=x, v=x, mask=mask)
         y = y + x  # add
-        y = self.layer_norm(y)
+        y = jax.vmap(self.layer_norm)(y)
 
         x = self.multi_attn(enc_out, enc_out, y, mask)
         x = x + y
-        x = self.layer_norm(x)
+        x = jax.vmap(self.layer_norm)(x)
 
         y = jax.vmap(self.ff)(x)
         y = x + y  # add
 
-        y = self.layer_norm(y)
+        y = jax.vmap(self.layer_norm)(y)
 
         return y

@@ -12,7 +12,6 @@ class MLP(eqx.Module):
     block: if true indicates this is for a transformer block
     """
     layers: list
-    debug_msg: str
 
     def __init__(
         self,

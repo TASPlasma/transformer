@@ -16,23 +16,22 @@ class EncoderBlock(eqx.Module):
         keys = jax.random.split(key, 2)
         self.multi_attn = MultiHeadAttention(cfg, keys[0])
         self.layer_norm = nn.LayerNorm(
-            shape=(cfg.seq_len, cfg.model_size))
+            shape=cfg.model_size)
         self.ff = MLP(cfg, keys[1], block=True)
 
     def __call__(self, x, mask):
         """
         (seq_len, d_model) -> (seq_len, d_model)
         """
-        print(f'{x.shape=}, {mask.shape=}')
         y = self.multi_attn(q=x, k=x, v=x, mask=mask)
         y = y + x  # add
 
-        y = self.layer_norm(y)
+        y = jax.vmap(self.layer_norm)(y)
 
         x = jax.vmap(self.ff)(y)
 
         x = x + y  # add
 
-        x = self.layer_norm(x)
+        x = jax.vmap(self.layer_norm)(x)
 
         return x
